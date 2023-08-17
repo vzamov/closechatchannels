@@ -88,7 +88,7 @@ async function fetchActiveChats() {
     }
 }
 
-async function markChatInactive(chatSid) {
+async function markChatClosed(chatSid) {
     try {
         const chat = await client.chat.v2.services(process.env.TWILIO_CHAT_INSTANCE).channels(chatSid).fetch();
         const chatAttributes = JSON.parse(chat.attributes);
@@ -98,11 +98,11 @@ async function markChatInactive(chatSid) {
         }
 
         await client.chat.v2.services(process.env.TWILIO_CHAT_INSTANCE).channels(chatSid).update({
-            attributes: '{"status":"INACTIVE"}'
+            attributes: '{"status":"closed"}'
         });
-        console.log(`Chat ${chatSid} marked as INACTIVE`);
+        console.log(`Chat ${chatSid} marked as CLOSED`);
     } catch (err) {
-        console.error(`Error marking chat ${chatSid} as INACTIVE:`, err);
+        console.error(`Error marking chat ${chatSid} as CLOSED:`, err);
     }
 }
 
@@ -111,7 +111,7 @@ async function processChats() {
         const data = JSON.parse(fs.readFileSync('Output.txt', 'utf-8'));
 
         for (let chatSid of data.activeChats) {
-            await markChatInactive(chatSid);
+            await markChatClosed(chatSid);
         }
 
         console.log('All chats processed.');
