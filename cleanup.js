@@ -91,20 +91,28 @@ async function fetchActiveChats() {
 async function markChatClosed(chatSid) {
     try {
         const chat = await client.chat.v2.services(process.env.TWILIO_CHAT_INSTANCE).channels(chatSid).fetch();
+        
+        // Parse the existing attributes
         const chatAttributes = JSON.parse(chat.attributes);
-
+        
+        // Modify the status attribute
+        chatAttributes.status = "closed";
+        
+        // If there's a sessionSid, close the proxy session
         if (chatAttributes && chatAttributes.sessionSid) {
             await closeProxySession(chatAttributes.sessionSid);
         }
 
+        // Update the chat channel with the modified attributes
         await client.chat.v2.services(process.env.TWILIO_CHAT_INSTANCE).channels(chatSid).update({
-            attributes: '{"status":"closed"}'
+            attributes: JSON.stringify(chatAttributes)
         });
         console.log(`Chat ${chatSid} marked as CLOSED`);
     } catch (err) {
         console.error(`Error marking chat ${chatSid} as CLOSED:`, err);
     }
 }
+
 
 async function processChats() {
     try {
