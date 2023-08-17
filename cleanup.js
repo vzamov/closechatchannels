@@ -61,7 +61,7 @@ async function fetchActiveChats() {
         let pages = await client.chat.v2.services(process.env.TWILIO_CHAT_INSTANCE).channels.page({ pageSize: pagesize });
         do {
             activeChats = activeChats.concat(
-                pages.instances.filter(c => c.attributes.includes('ACTIVE') && !c.attributes.includes('INACTIVE')).map(c => c.sid)
+                pages.instances.filter(c => c.attributes.includes('ACTIVE') && c.attributes.includes('INACTIVE')).map(c => c.sid)
             );
 
             // Check for the next page and wait before fetching
